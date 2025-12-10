@@ -177,22 +177,29 @@ def train_deepseek_ocr_on_uit_hwdb(
     )
 
     args = TrainingArguments(
-        output_dir=str(output_dir),
-        per_device_train_batch_size=2,
-        per_device_eval_batch_size=2,
-        gradient_accumulation_steps=4,   # effective batch size = 8
-        learning_rate=2e-4,
-        warmup_steps=5,
-        max_steps=60,
-        logging_steps=10,
-        evaluation_strategy="steps",
-        eval_steps=60,
-        save_steps=60,
-        bf16=is_bf16_supported(),
-        fp16=not is_bf16_supported(),
-        remove_unused_columns=False,
-        report_to="none",
+    output_dir=output_dir,
+    per_device_train_batch_size=2,
+    per_device_eval_batch_size=2,
+    gradient_accumulation_steps=4,
+    learning_rate=2e-4,
+    warmup_steps=5,
+    max_steps=60,
+    logging_steps=10,
+    
+    # dùng tên mới:
+    eval_strategy="steps",
+    eval_steps=60,
+    
+    # khai báo rõ luôn chiến lược save:
+    save_strategy="steps",
+    save_steps=60,
+
+    bf16=is_bf16_supported(),
+    fp16=not is_bf16_supported(),
+    remove_unused_columns=False,
+    report_to="none",
     )
+
 
     trainer = Trainer(
         model=model,
