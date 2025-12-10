@@ -1,0 +1,15 @@
+torch
+torchvision
+numpy
+Pillow
+jiwer
+tqdm
+unsloth
+transformers
+datasets
+huggingface_hub
+matplotlib
+addict
+einops
+easydict
+triton
