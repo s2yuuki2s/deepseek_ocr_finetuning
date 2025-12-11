@@ -6,7 +6,7 @@ from typing import Optional, Dict, Any
 
 import torch
 from transformers import AutoModel
-from unsloth import FastVisionModel, FastVisionModel as FVM   # FVM chỉ để ngắn
+from unsloth import FastVisionModel, FastVisionModel as FVM  # FVM chỉ để ngắn
 
 # Dùng đúng prompt như khi training
 DEFAULT_PROMPT = "<image>\nFree OCR. "
@@ -43,7 +43,7 @@ class DeepSeekOCRInference:
         # Unsloth tự nhận: nếu model_path là LoRA checkpoint nó sẽ load base + adapter
         self.model, self.tokenizer = FastVisionModel.from_pretrained(
             model_path,
-            load_in_4bit=False,          # inference 16-bit cho ổn định
+            load_in_4bit=False,  # inference 16-bit cho ổn định
             auto_model=AutoModel,
             trust_remote_code=True,
             unsloth_force_compile=True,  # giống setting trong docs DeepSeek-OCR :contentReference[oaicite:0]{index=0}
@@ -73,7 +73,7 @@ class DeepSeekOCRInference:
             base_size=self.base_size,
             image_size=self.image_size,
             crop_mode=self.crop_mode,
-            save_results=False,   # không cần lưu result.mmd / ảnh bbox
+            save_results=False,  # không cần lưu result.mmd / ảnh bbox
             test_compress=False,
         )
 
@@ -106,11 +106,18 @@ class DeepSeekOCRInference:
 if __name__ == "__main__":
     import argparse
 
-    parser = argparse.ArgumentParser(description="Run DeepSeek-OCR inference on one image.")
-    parser.add_argument("--model_path", type=str, default="unsloth/DeepSeek-OCR",
-                        help="Model ID hoặc đường dẫn checkpoint (vd outputs/deepseek_ocr_uit_hwdb).")
-    parser.add_argument("--image", type=str, required=True,
-                        help="Đường dẫn tới ảnh cần OCR.")
+    parser = argparse.ArgumentParser(
+        description="Run DeepSeek-OCR inference on one image."
+    )
+    parser.add_argument(
+        "--model_path",
+        type=str,
+        default="unsloth/DeepSeek-OCR",
+        help="Model ID hoặc đường dẫn checkpoint (vd outputs/deepseek_ocr_uit_hwdb).",
+    )
+    parser.add_argument(
+        "--image", type=str, required=True, help="Đường dẫn tới ảnh cần OCR."
+    )
     args = parser.parse_args()
 
     infer = DeepSeekOCRInference(args.model_path)

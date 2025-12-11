@@ -3,7 +3,7 @@
 import io
 import math
 from dataclasses import dataclass
-from typing import Any, List, Dict, Tuple
+from typing import Any, Dict, List, Tuple
 
 import torch
 from PIL import Image, ImageOps
@@ -12,13 +12,14 @@ from torch.nn.utils.rnn import pad_sequence
 try:
     # Trường hợp bạn cài sẵn package deepseek_ocr (ít khả năng)
     from deepseek_ocr.modeling_deepseekocr import (
-        text_encode,
         BasicImageTransform,
         dynamic_preprocess,
+        text_encode,
     )
 except ModuleNotFoundError:
     import sys
     from pathlib import Path
+
     from huggingface_hub import snapshot_download
 
     project_root = Path(__file__).resolve().parents[2]
@@ -27,7 +28,10 @@ except ModuleNotFoundError:
 
     # Chỉ tải nếu chưa có file modeling_deepseekocr.py
     if not (pkg_dir / "modeling_deepseekocr.py").exists():
-        print("[INFO] deepseek_ocr package not found. Downloading unsloth/DeepSeek-OCR code to", pkg_dir)
+        print(
+            "[INFO] deepseek_ocr package not found. Downloading unsloth/DeepSeek-OCR code to",
+            pkg_dir,
+        )
         snapshot_download(
             "unsloth/DeepSeek-OCR",
             local_dir=str(pkg_dir),
@@ -36,7 +40,9 @@ except ModuleNotFoundError:
     # Biến thư mục này thành package Python
     init_file = pkg_dir / "__init__.py"
     if not init_file.exists():
-        init_file.write_text("# package for DeepSeek-OCR model code\n", encoding="utf-8")
+        init_file.write_text(
+            "# package for DeepSeek-OCR model code\n", encoding="utf-8"
+        )
 
     # Thêm parent của package vào sys.path
     parent = pkg_dir.parent  # = data/
@@ -45,10 +51,11 @@ except ModuleNotFoundError:
 
     # Bây giờ import lại nhưng với tên package đầy đủ
     from deepseek_ocr_model.modeling_deepseekocr import (
-        text_encode,
         BasicImageTransform,
         dynamic_preprocess,
+        text_encode,
     )
+
 
 @dataclass
 class DeepSeekOCRDataCollator:
@@ -66,6 +73,7 @@ class DeepSeekOCRDataCollator:
       - images_seq_mask: (B, L) bool
       - images_spatial_crop: (sum_images, 2) long
     """
+
     tokenizer: Any
     model: Any
     image_size: int = 640
@@ -120,7 +128,13 @@ class DeepSeekOCRDataCollator:
 
     def process_image(
         self, image: Image.Image
-    ) -> Tuple[List[torch.Tensor], List[torch.Tensor], List[List[int]], List[int], Tuple[int, int]]:
+    ) -> Tuple[
+        List[torch.Tensor],
+        List[torch.Tensor],
+        List[List[int]],
+        List[int],
+        Tuple[int, int],
+    ]:
         images_list: List[torch.Tensor] = []
         images_crop_list: List[torch.Tensor] = []
         images_spatial_crop: List[List[int]] = []
@@ -196,7 +210,13 @@ class DeepSeekOCRDataCollator:
             ) * num_queries
             tokenized_image += [self.image_token_id]
 
-        return images_list, images_crop_list, images_spatial_crop, tokenized_image, crop_ratio
+        return (
+            images_list,
+            images_crop_list,
+            images_spatial_crop,
+            tokenized_image,
+            crop_ratio,
+        )
 
     def process_single_sample(self, messages: List[Dict]) -> Dict[str, Any]:
         """
@@ -213,7 +233,9 @@ class DeepSeekOCRDataCollator:
                         images.append(pil_image)
 
         if not images:
-            raise ValueError("No images found in sample. Each sample must contain images.")
+            raise ValueError(
+                "No images found in sample. Each sample must contain images."
+            )
 
         tokenized_str: List[int] = []
         images_seq_mask: List[bool] = []
